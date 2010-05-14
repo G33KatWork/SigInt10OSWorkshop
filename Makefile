@@ -3,7 +3,7 @@ include $(SRC)/build/base.mak
 
 STARTTIME := $(shell date +%s)
 
-SUBTARGETS = a20gate biosprint gdt cboot interrupts
+SUBTARGETS = a20gate biosprint gdt cboot interrupts longmode
 DIRS = $(SUBTARGETS:%=%.dir)
 
 # Main targets
@@ -13,6 +13,7 @@ all: toolchain $(DIRS)
 %.dir:
 	$(call cmd_msg,SUBDIR,$*)
 	$(call call_submake,$*,all)
+	@echo ""
 
 # Toolchain
 toolchain: $(CC)

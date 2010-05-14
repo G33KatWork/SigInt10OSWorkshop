@@ -35,7 +35,7 @@ endif
 	$(Q)sudo rm -Rf tmp
 
 
-qemu: floppy.img
+qemu: all floppy.img
 	$(call cmd_msg,QEMU,floppy.img)
 	$(Q)$(QEMU) -fda floppy.img
 

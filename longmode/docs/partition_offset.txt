@@ -1,0 +1,13 @@
+hdd.img contains a whole disk with an msdos partition table
+if we want to mount the partition with linux, we need to specify
+the offset where it begins
+
+the get this offset, open the image with parted and to the following:
+type 'unit' <enter>
+type 'B' <enter>
+now we have Bytes as a measurement unit
+type 'print' <enter>
+read the value at 'Start' of the desired partition and use this value as
+the offset value in the following mount command:
+
+mount -o loop,offset=32256 -t vfat hdd.img /mnt/partition

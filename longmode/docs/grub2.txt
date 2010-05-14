@@ -1,0 +1,17 @@
+GRUB2:
+
+- autogen.sh
+- configure --prefix=/home/user/installdirfoo
+- make
+- make install
+
+- partition disk
+- mount disk to /mnt/disk
+- cd /home/user/installdirfoo
+- execute: sudo ./sbin/grub-install --root-directory=/mnt/disk /dev/sdb
+
+- if error that embedded region is unusually small, do "fdisk -S 63 /dev/sdb" and repartition
+    -S 63 sets the sectors per track value
+
+
+http://grub.enbug.org/TestingOnX86
