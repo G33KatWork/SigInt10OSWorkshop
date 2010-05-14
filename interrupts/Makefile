@@ -23,7 +23,7 @@ OBJDIR = obj
 SRCDIR = src
 
 # C compiler flags
-CFLAGS += -g -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=gnu99
+CFLAGS += -m32 -g -nostdlib -nostdinc -fno-builtin -fno-stack-protector -std=gnu99
 CFLAGS += -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
 			-Wwrite-strings -Wmissing-prototypes -Wmissing-declarations \
 			-Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
@@ -32,7 +32,7 @@ CFLAGS += -DARCH_X86 -DDEBUG
 CFLAGS += $(addprefix -I,$(INCLUDES))
 
 # C++ compiler flags
-CXXFLAGS += -g -fno-builtin -fno-exceptions -fno-rtti -nostdlib -nostartfiles -nodefaultlibs
+CXXFLAGS += -m32 -g -fno-builtin -fno-exceptions -fno-rtti -nostdlib -nostartfiles -nodefaultlibs
 CXXFLAGS += -Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
 			-Wwrite-strings -Wredundant-decls -Winline -Wno-long-long \
 			-Wconversion #-Werror
@@ -43,7 +43,7 @@ CXXFLAGS += $(addprefix -I,$(INCLUDES))
 ASFLAGS = -f elf -g
 
 # Linker flags
-LDFLAGS = -T linker.ld -Map kernel.map
+LDFLAGS = -T linker.ld -Map kernel.map -z max-page-size=0x1000
 
 # Determinte objects to be created
 OBJECTS += $(ASOURCES:%.S=%.o)

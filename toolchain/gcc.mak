@@ -1,19 +1,13 @@
-GCC_VERSION    := 4.2.2
+GCC_VERSION    := 4.4.4
 GCC_SOURCE     := $(TOOLCHAIN_SRCDIR)/gcc-$(GCC_VERSION).tar.bz2
 GCC_DOWNLOAD   := http://ftp.gnu.org/gnu/gcc/gcc-$(GCC_VERSION)/gcc-$(GCC_VERSION).tar.bz2
 GCC_PATCHES    := 
-
-ifeq ($(TOOLCHAIN_TARGET),avr32)
-GCC_PATCHES += $(TOOLCHAIN_PATCHDIR)/gcc-$(GCC_VERSION).atmel.1.1.3.patch
-endif
-
-#$(TOOLCHAIN_PATCHDIR)/gcc-$(GCC_VERSION).atmel.1.1.3-revert-broken-uclibc-stuff.patch $(TOOLCHAIN_PATCHDIR)/902-avr32-revert-broken-read-modify-write-stuff.patch
 
 PATH += :$(TOOLCHAIN_ROOTDIR)/bin
 
 # Hack to build on OS X.
 ifeq ($(shell uname),Darwin)
-  GCC_CONFOPTS := --with-gmp=/opt/local --with-mpfr=/opt/local
+  GCC_CONFOPTS := --with-gmp=/opt/local --with-mpfr=/opt/local --with-libiconv-prefix=/opt/local
 endif
 
 # Download
