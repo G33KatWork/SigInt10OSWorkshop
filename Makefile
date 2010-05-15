@@ -3,7 +3,7 @@ include $(SRC)/build/base.mak
 
 STARTTIME := $(shell date +%s)
 
-SUBTARGETS = a20gate biosprint gdt cboot interrupts longmode timer
+SUBTARGETS = a20gate biosprint gdt cboot interrupts longmode timer multitasking
 DIRS = $(SUBTARGETS:%=%.dir)
 
 # Main targets
