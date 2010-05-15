@@ -1,0 +1,36 @@
+This is the SIGINT10 sample code for my x86 bootstrapping workshop.
+
+To get started, just checkout the code, change into the root directory
+and execute a simple "make".
+The first thing that happens is that the complete cross-compiling toolchain
+is built. This is necessary because we want to have a stand-alone toolchain
+without any dependencies of your operating system.
+
+Note that you will need to install all dependencies of binutils, gcc, gdb,
+nasm, qemu and bochs first for a sucessful build. This should only be a
+compiler on your host, mpfr and gmp, I think.
+If you have trouble you can set the environment variable V to get verbose
+output from my buildsystem.
+Example: make V=1
+
+After that all the subprojects are build with your shiny new toolchain.
+To run the generated floppy or hdd images, just change to a subdirectory
+and execute a "make qemu" and off you go...
+
+The toolchain itself is only built once. It even survives a "make clean".
+If you want to get rid of it, do a "make distclean".
+However, the first "make clean" in your project root will remove all the
+temporary files which were created during the toolchain build. So, you
+should execute this command directly after the first build of all projects
+finished sucessfully.
+
+You can also build one subproject independently from all other subprojects.
+To do this, just stay in the directory of the subproject and do your
+"make" and "make qemu" there.
+
+Sometimes, you are asked for your password.
+This is a sudo which is used to mount several floppy or hdd images to
+copy the compiled elf-file onto it. Nothing evil, see for yourself.
+
+Have fun!
+
