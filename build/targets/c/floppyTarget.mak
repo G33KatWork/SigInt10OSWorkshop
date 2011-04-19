@@ -32,6 +32,7 @@ else
 	$(Q)sudo umount tmp $(QOUTPUT)
 endif
 
+	$(Q)sudo chmod 666 floppy.img
 	$(Q)sudo rm -Rf tmp
 
 

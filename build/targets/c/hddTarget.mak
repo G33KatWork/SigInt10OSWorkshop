@@ -37,6 +37,7 @@ else
 	$(Q)sudo umount tmp $(QOUTPUT)
 endif
 
+	$(Q)sudo chmod 666 hdd.img
 	$(Q)sudo rm -Rf tmp
 
 

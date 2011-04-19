@@ -1,4 +1,4 @@
-GCC_VERSION    := 4.4.4
+GCC_VERSION    := 4.6.0
 GCC_SOURCE     := $(TOOLCHAIN_SRCDIR)/gcc-$(GCC_VERSION).tar.bz2
 GCC_DOWNLOAD   := http://ftp.gnu.org/gnu/gcc/gcc-$(GCC_VERSION)/gcc-$(GCC_VERSION).tar.bz2
 GCC_PATCHES    := 

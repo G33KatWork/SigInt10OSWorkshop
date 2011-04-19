@@ -54,7 +54,7 @@ hang:                               ;just loop to do nothing
 	
 ;---------------------------- DATA ----------------------------
 
-msg     db	'Hello Geekend!', 13, 10, 0
+msg     db	'Hello Easterhegg!', 13, 10, 0
 msg2    db  'Enabling A20 Gate', 13, 10, 0
 msg3    db  'A20 Gate enabled', 13, 10, 0
 msg4    db  'GDT loaded', 13, 10, 0

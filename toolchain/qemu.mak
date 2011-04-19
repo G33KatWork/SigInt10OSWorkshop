@@ -1,5 +1,5 @@
-QEMU_VERSION		:= 0.12.4
-QEMU_SOURCE	     	:= $(TOOLCHAIN_SRCDIR)/qemu-$(QEMU_VERSION).tar.gz
+QEMU_VERSION		:= 0.14.0
+QEMU_SOURCE	     	:= $(TOOLCHAIN_SRCDIR)/qemu-$(QEMU_VERSION).tar.bz2
 QEMU_DOWNLOAD	    := http://download.savannah.gnu.org/releases/qemu/qemu-$(QEMU_VERSION).tar.gz
 QEMU_PATCHES	    := 
 
@@ -16,7 +16,7 @@ $(QEMU_SOURCE):
 $(TOOLCHAIN_ROOTDIR)/.qemu-extract: $(QEMU_SOURCE)
 	$(Q)mkdir -p $(TOOLCHAIN_BUILDDIR)
 	$(call cmd_msg,EXTRACT,$(subst $(SRC)/$(SRCSUBDIR)/,,$(QEMU_SOURCE)))
-	$(Q)tar -C $(TOOLCHAIN_BUILDDIR) -xzf $(QEMU_SOURCE)
+	$(Q)tar -C $(TOOLCHAIN_BUILDDIR) -xjf $(QEMU_SOURCE)
 	$(call cmd_msg,PATCH,$(subst $(SRC)/$(SRCSUBDIR)/,,$(QEMU_PATCHES)))
 	$(Q)$(foreach patch,$(QEMU_PATCHES), \
 		cd $(TOOLCHAIN_BUILDDIR)/qemu-$(QEMU_VERSION); \

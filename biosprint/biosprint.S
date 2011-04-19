@@ -18,7 +18,7 @@ bios_print:
 done:
 	ret                             ;we are done. return
 	
-    msg	db  'Hello Geekend!', 13, 10, 0
+    msg	db  'Hello Easterhegg!', 13, 10, 0
 
     times 510-($-$$) db 0
     db 0x55
