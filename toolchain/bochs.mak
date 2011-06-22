@@ -1,5 +1,5 @@
 BOCHS_VERSION		:= 2.4.6
-BOCHS_SOURCE	    := $(TOOLCHAIN_SRCDIR)/bochs-$(BOCHS_VERSION).tar.bz2
+BOCHS_SOURCE	    := $(TOOLCHAIN_SRCDIR)/bochs-$(BOCHS_VERSION).tar.gz
 BOCHS_DOWNLOAD	    := http://downloads.sourceforge.net/project/bochs/bochs/$(BOCHS_VERSION)/bochs-$(BOCHS_VERSION).tar.gz
 BOCHS_PATCHES	    := 
 
@@ -16,7 +16,7 @@ $(BOCHS_SOURCE):
 $(TOOLCHAIN_ROOTDIR)/.bochs-extract: $(BOCHS_SOURCE)
 	$(Q)mkdir -p $(TOOLCHAIN_BUILDDIR)
 	$(call cmd_msg,EXTRACT,$(subst $(SRC)/$(SRCSUBDIR)/,,$(BOCHS_SOURCE)))
-	$(Q)tar -C $(TOOLCHAIN_BUILDDIR) -xjf $(BOCHS_SOURCE)
+	$(Q)tar -C $(TOOLCHAIN_BUILDDIR) -xzf $(BOCHS_SOURCE)
 	$(call cmd_msg,PATCH,$(subst $(SRC)/$(SRCSUBDIR)/,,$(BOCHS_PATCHES)))
 	$(Q)$(foreach patch,$(BOCHS_PATCHES), \
 		cd $(TOOLCHAIN_BUILDDIR)/bochs-$(BOCHS_VERSION); \

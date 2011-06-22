@@ -3,8 +3,11 @@ GDB_SOURCE     := $(TOOLCHAIN_SRCDIR)/gdb-$(GDB_VERSION).tar.bz2
 GDB_DOWNLOAD   := http://ftp.gnu.org/gnu/gdb/gdb-$(GDB_VERSION).tar.bz2
 GDB_PATCHES    := 
 
-ifeq ($(TOOLCHAIN_TARGET),avr32)
-GDB_PATCHES += $(TOOLCHAIN_PATCHDIR)/gdb-$(GDB_VERSION).atmel.1.0.3.patch
+#Fixup GDB build for x86_64-elf
+ifeq ($(TOOLCHAIN_TARGET),x86_64-elf)
+	GDB_TARGET_ARCH := x86_64-pc-linux-gnu
+else
+	GDB_TARGET_ARCH = $(TOOLCHAIN_TARGET)
 endif
 
 # Download
@@ -34,26 +37,26 @@ $(TOOLCHAIN_ROOTDIR)/.gdb-configure: $(TOOLCHAIN_ROOTDIR)/.gdb-extract
 		rm -rf $(TOOLCHAIN_BUILDDIR)/gdb-build; \
 	fi
 	$(Q)mkdir -p $(TOOLCHAIN_BUILDDIR)/gdb-build
-	$(call cmd_msg,CONFIG,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(TOOLCHAIN_TARGET)))
+	$(call cmd_msg,CONFIG,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(GDB_TARGET_ARCH)))
 	$(Q)cd $(TOOLCHAIN_BUILDDIR)/gdb-build; \
 		../gdb-$(GDB_VERSION)/configure \
 		--disable-werror \
 		--prefix=$(TOOLCHAIN_ROOTDIR) \
-		--target=$(TOOLCHAIN_TARGET) \
+		--target=$(GDB_TARGET_ARCH) \
 		$(QOUTPUT)
 	$(Q)touch $(@)
 
 
 # Compile
 $(TOOLCHAIN_ROOTDIR)/.gdb-compile: $(TOOLCHAIN_ROOTDIR)/.gdb-configure
-	$(call cmd_msg,COMPILE,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(TOOLCHAIN_TARGET)))
+	$(call cmd_msg,COMPILE,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(GDB_TARGET_ARCH)))
 	$(Q)cd $(TOOLCHAIN_BUILDDIR)/gdb-build; $(MAKE) all $(QOUTPUT)
 	$(Q)touch $(@)
 
 
 # Install
 $(TOOLCHAIN_ROOTDIR)/.gdb-install: $(TOOLCHAIN_ROOTDIR)/.gdb-compile
-	$(call cmd_msg,INSTALL,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(TOOLCHAIN_TARGET)))
+	$(call cmd_msg,INSTALL,$(TOOLCHAIN_TARGET)/gdb-$(GDB_VERSION) ($(GDB_TARGET_ARCH)))
 	$(Q)cd $(TOOLCHAIN_BUILDDIR)/gdb-build; $(MAKE) install $(QOUTPUT)
 	$(Q)touch $(@)
 

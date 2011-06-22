@@ -3,10 +3,6 @@ BINUTILS_SOURCE     := $(TOOLCHAIN_SRCDIR)/binutils-$(BINUTILS_VERSION).tar.bz2
 BINUTILS_DOWNLOAD   := http://ftp.gnu.org/gnu/binutils/binutils-$(BINUTILS_VERSION).tar.bz2
 BINUTILS_PATCHES    := 
 
-ifeq ($(TOOLCHAIN_TARGET),avr32)
-BINUTILS_PATCHES += $(TOOLCHAIN_PATCHDIR)/binutils-$(BINUTILS_VERSION).atmel.1.0.1.patch
-endif
-
 # Download
 $(BINUTILS_SOURCE):
 	$(call target_mkdir)
