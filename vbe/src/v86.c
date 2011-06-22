@@ -97,7 +97,8 @@ static void v86_start_execution(void)
     asm volatile ("ljmp $0x20, $0x0");
     
     //if a GPF is thrown, we end up here
-    //since the kernel cpu switches back to the kernel task
+    //since the cpu switches back to the kernel task where we handle
+    //the faulting instruction and jump back to the v86 task
     print_string_static("GPF occured\n");
     int errorCode;
     asm volatile ("pop %%eax" : "=a"(errorCode));
@@ -116,7 +117,7 @@ static void v86_start_execution(void)
             
             case 0x67:      //A32
                 print_string_static("A32\n");
-                o32 = 1;
+                a32 = 1;
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 continue;
             
