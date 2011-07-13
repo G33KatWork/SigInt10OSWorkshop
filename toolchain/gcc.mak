@@ -1,4 +1,4 @@
-GCC_VERSION    := 4.6.0
+GCC_VERSION    := 4.6.1
 GCC_SOURCE     := $(TOOLCHAIN_SRCDIR)/gcc-$(GCC_VERSION).tar.bz2
 GCC_DOWNLOAD   := http://ftp.gnu.org/gnu/gcc/gcc-$(GCC_VERSION)/gcc-$(GCC_VERSION).tar.bz2
 GCC_PATCHES    := 
@@ -7,7 +7,11 @@ PATH += :$(TOOLCHAIN_ROOTDIR)/bin
 
 # Hack to build on OS X.
 ifeq ($(shell uname),Darwin)
-  GCC_CONFOPTS := --with-gmp=/opt/local --with-mpfr=/opt/local --with-libiconv-prefix=/opt/local
+# fix compilation issue with llvm/clang (internal compiler error at runtime)
+CC = /usr/bin/gcc-4.2
+CPP = /usr/bin/cpp-4.2
+CXX = /usr/bin/g++-4.2
+LD = /usr/bin/gcc-4.2
 endif
 
 # Download

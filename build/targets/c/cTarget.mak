@@ -3,6 +3,11 @@
 # CXXSOURCES if you want to build C/C++ sourcecode into
 # and ELF file
 
+# If Clang is used, the host triple needs to be defined and the internal assembler activated
+ifeq ($(USE_LLVM),1)
+CFLAGS		+= -ccc-host-triple x86_64-pc-elf -integrated-as
+CXXFLAGS 	+= -ccc-host-triple x86_64-pc-elf -integrated-as
+endif
 
 # Determinte objects to be created
 OBJECTS += $(ASOURCES:%.S=%.o)

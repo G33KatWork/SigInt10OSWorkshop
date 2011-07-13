@@ -52,6 +52,10 @@ endef
 TOOLCHAIN_TARGET    := x86_64-elf
 #TOOLCHAIN_TARGET    := i686-elf
 
+# Use GCC or LLVM?
+# CFLAGS of subprojects need probably to be adjusted
+USE_LLVM			:= 0
+
 # Define root directory
 SRC                 := $(shell cd $(SRC); pwd)
 

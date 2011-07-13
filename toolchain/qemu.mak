@@ -1,8 +1,17 @@
-QEMU_VERSION		:= 0.14.0
-QEMU_SOURCE	     	:= $(TOOLCHAIN_SRCDIR)/qemu-$(QEMU_VERSION).tar.bz2
+QEMU_VERSION		:= 0.14.1
+QEMU_SOURCE	     	:= $(TOOLCHAIN_SRCDIR)/qemu-$(QEMU_VERSION).tar.gz
 QEMU_DOWNLOAD	    := http://download.savannah.gnu.org/releases/qemu/qemu-$(QEMU_VERSION).tar.gz
 QEMU_PATCHES	    := 
 
+
+# Hack to build on OS X.
+ifeq ($(shell uname),Darwin)
+# fix compilation issue with llvm/clang (segfault at runtime)
+CC = /usr/bin/gcc-4.2
+CPP = /usr/bin/cpp-4.2
+CXX = /usr/bin/g++-4.2
+LD = /usr/bin/gcc-4.2
+endif
 
 # Download
 $(QEMU_SOURCE):
