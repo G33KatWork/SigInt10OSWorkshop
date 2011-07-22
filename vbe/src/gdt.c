@@ -45,6 +45,11 @@ void gdt_set_descriptor(uint16_t i, uint32_t base, uint32_t limit, uint8_t acces
     print_string_static("\n");*/
 }
 
+void gdt_clear_tss_busy_flag(uint16_t i)
+{
+    gdt[i].access &= 0xFD;
+}
+
 void gdt_install(void)
 {
     //update pointer

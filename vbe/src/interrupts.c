@@ -23,6 +23,8 @@ void interrupts_faultHandler(registers_t regs)
         print_string_static(" - At: ");
         print_integer(regs.eip, 16);
         print_string_static("\n");
+        
+        for(;;);
     }
 }
 

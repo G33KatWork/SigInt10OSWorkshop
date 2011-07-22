@@ -8,6 +8,15 @@
 #include <pit.h>
 #include <v86.h>
 #include <lib.h>
+#include <vbe.h>
+#include <video.h>
+#include <bitmap.h>
+#include <serial.h>
+#include <vgamode3.h>
+
+#include <bitmap_file.h>
+
+bool pageFlippingSupported = FALSE;
 
 void cpu_init(void);
 int kmain(void* mbd, unsigned int magic);
@@ -31,18 +40,10 @@ void cpu_init()
     gdt_install();
 }
 
-struct vbeControllerInfo {
-   char signature[4];             // == "VESA"
-   short version;                 // == 0x0300 for VBE 3.0
-   short oemString[2];            // isa vbeFarPtr
-   unsigned char capabilities[4];
-   short videomodes[2];           // isa vbeFarPtr
-   short totalMemory;             // as # of 64KB blocks
-};
-
 int kmain(void* UNUSED(mbd), unsigned int UNUSED(magic))
 {
-    print_clear();
+    //print_init(&print_vgamode3_handler);
+    print_init(&print_serial_handler);
     print_string_static("v86 demo\n");
     
     cpu_init();					//set up GDT
@@ -53,27 +54,105 @@ int kmain(void* UNUSED(mbd), unsigned int UNUSED(magic))
     v86_init();
     print_string_static("v86 initialized\n");
     
-    struct v86_biosArguments results = {.eax = 0x4f00, .es = 0x2000, .edi = 0};
-    v86_bioscall(0x10, results, &results);
+    interrupts_enable();
+	/*interrupts_registerHandler(IRQ_TIMER, timerHandler);*/
+	pit_init(1000);
+	//pic_unmask_irq(IRQ_TIMER);
     
-    if(results.eax == 0x4f)
+    struct vbeControllerInfo* controllerInfo = vbe_getControllerInfo();
+    print_string_static("VBE OEM vendor name: ");
+    print_string((char*)REALMODE_PTR(controllerInfo->oemVendorNamePtr[1], controllerInfo->oemVendorNamePtr[0]));
+    print_string_static("\n");
+    print_string_static("VBE OEM product name: ");
+    print_string((char*)REALMODE_PTR(controllerInfo->oemProductNamePtr[1], controllerInfo->oemProductNamePtr[0]));
+    print_string_static("\n");
+    
+    /*uint16_t* modeArray = (uint16_t*)REALMODE_PTR(controllerInfo->videomodes[1], controllerInfo->videomodes[0]);
+    
+    while(*modeArray != 0xFFFF)
     {
-        print_string_static("Query for VBE controller info was successful:\n");
+        struct vbeModeInfo* modeInfo = vbe_getModeInfo(*modeArray);
         
-        struct vbeControllerInfo* info = (struct vbeControllerInfo*)0x20000;
-        print_string_static("VBE Signature:");
-        print_string(info->signature);
-        print_string_static("\nVBE Version:");
-        print_integer(info->version, 16);
+        if(!modeInfo)
+        {
+            print_string_static("Modeinfo retrieval failed: ");
+            print_integer(*modeArray, 16);
+            continue;
+        }
+        
+        print_integer(*modeArray, 16);
+        
+        if(modeInfo->attributes & VBEMODE_ATTR_HWSUPPORT)
+            print_string_static(" Available Mode: ");
+        else
+            print_string_static("Unvailable Mode: ");
+        
+        if(modeInfo->attributes & VBEMODE_ATTR_COLOR)
+            print_string_static("Color - ");
+        else
+            print_string_static("Monochrome - ");
+        
+        if(modeInfo->attributes & VBEMODE_ATTR_GRAPHICS)
+            print_string_static("Graphics - ");
+        else
+            print_string_static("Text - ");
+        
+        if(modeInfo->attributes & VBEMODE_ATTR_LINEARFRAMEBUF)
+            print_string_static("Linear FB - ");
+        else
+            print_string_static("Nonlinear FB - ");
+            
+        print_string_static(" Mem: ");
+        print_integer(modeInfo->memoryModel, 16);
+        print_string_static(" ");
+        
+        print_string_static(" Res: ");
+        print_integer(modeInfo->Xres, 10);
+        print_string_static("x");
+        print_integer(modeInfo->Yres, 10);
+        print_string_static("x");
+        print_integer(modeInfo->bpp, 10);
+        
+        print_string_static("\n");
+        
+        modeArray++;
+    }*/
+    
+    uint16_t closestMode = vbe_findClosestMode(800, 600, 32);
+    vbe_setMode(closestMode);
+    
+    if(vbe_isPageFlippingAvailable(controllerInfo, vbe_getModeInfo(closestMode)))
+    {
+        print_string_static("Doublebuffering seems to be available.\n");
+        pageFlippingSupported = TRUE;
     }
-    else
-        print_string_static("Query for VBE controller info was not successful - wrong return value in AX :'(\n");
+
+    struct blit_surface fbSurface;
+    vid_getBlitSurfaceFromVBEMode(&vbe_currentVbeMode, &fbSurface);
     
-	/*interrupts_enable();
-	interrupts_registerHandler(IRQ_TIMER, timerHandler);
-	pit_init(50);
-	pic_unmask_irq(IRQ_TIMER);*/
+    uint32_t bgcolor = vid_mapRGB(16, 67, 115, &fbSurface);
+
+	if(!bitmap_check_support(bitmap_file))
+		print_string_static("Bitmap doesn't seem to be in a supported format\n");
+		    
+    struct blit_surface bitmapSurface;
+    bitmap_get_blit_surface(bitmap_file, &bitmapSurface);
     
-	for(;;);
+    uint32_t x = 0, y = 0;
+	for(;;)
+	{
+	    //clear screen
+        vid_fillRect(bgcolor, 0, 0, 800, 600, &fbSurface);
+	    
+	    //draw silly cat
+	    vid_blit(x, y, bitmapSurface.width, bitmapSurface.height, 0, 0, &bitmapSurface, &fbSurface);
+	    
+        x+=5;
+	    if(x > 800 - bitmapSurface.width)
+            x = 0;
+        
+        if(pageFlippingSupported)
+            vid_flip(TRUE, &fbSurface);
+	}
     return 0;
 }

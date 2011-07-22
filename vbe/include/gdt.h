@@ -63,6 +63,7 @@ struct gdt_ptr
 extern void gdt_flush(void);
 
 void gdt_set_descriptor(uint16_t i, uint32_t base, uint32_t limit, uint8_t access, uint8_t grand);
+void gdt_clear_tss_busy_flag(uint16_t i);
 void gdt_install(void);
 
 #endif

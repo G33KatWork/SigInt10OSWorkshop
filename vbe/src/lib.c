@@ -14,6 +14,14 @@ size_t strlen(const char *str)
 	return retval;
 }
 
+char* strcpy(char *dest, const char *src)
+{
+	char *d = dest;
+
+	while((*d++ = *src++));
+	return dest;
+}
+
 void* memcpy(void *dest, const void* src, size_t count)
 {
     char *d = (char *)dest;

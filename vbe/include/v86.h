@@ -8,7 +8,8 @@
 //0x00007E00 to 0x0007FFFF are guaranteed to be free
 #define REALMODECODE      0x00007E00
 #define REALMODESTACK_END 0x00070000
-#define REALMODESTACK_TOP 0xFFFC
+
+#define REALMODE_PTR(segment, offset)   ((void*)((((uint16_t)segment) << 4) + ((uint16_t)offset)))
 
 struct v86_biosArguments
 {

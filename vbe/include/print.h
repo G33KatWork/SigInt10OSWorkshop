@@ -24,11 +24,20 @@ typedef enum
     None=16
 } Color;
 
+extern Color foregroundColor;
+extern Color backgroundColor;
+
+typedef struct {
+    void (*init)(void);
+    void (*clear)(void);
+    void (*putChar)(char c);
+} print_handler;
+
+void print_init(print_handler* handler);
 void print_clear(void);
 void print_string(char* s);
 void print_string_static(const char* s);
 void print_char(char c);
-void scroll(void);
 void print_integer(uint32_t n, uint8_t radix);
 
 #endif

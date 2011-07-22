@@ -1,6 +1,6 @@
 megs: 128
-romimage: file=../toolchain/i686-elf/share/bochs/BIOS-bochs-latest
-vgaromimage: file=../toolchain/i686-elf/share/bochs/VGABIOS-lgpl-latest
+romimage: file=../toolchain/x86_64-elf/share/bochs/BIOS-bochs-latest
+vgaromimage: file=../toolchain/x86_64-elf/share/bochs/VGABIOS-lgpl-latest
 floppya: 1_44=floppy.img, status=inserted
 boot: a
 log: bochsout.txt
@@ -9,7 +9,8 @@ clock: sync=realtime
 #cpu: ips=500000
 cpu: ips=2500000
 com1: enabled=1, mode=file, dev=serialOut
-display_library: x, options="gui_debug"
+#display_library: x, options="gui_debug"
+display_library: sdl
 panic: action=report
 error: action=report
 info: action=report

@@ -19,3 +19,14 @@ void pit_init(uint32_t frequency)
     outb(0x40, l);
     outb(0x40, h);
 }
+
+uint16_t pit_getCurrentCount()
+{
+    uint16_t count;
+    //latch the current count value of channel 0
+    outb(0x43, 0);
+    //get the count value of counter 0
+    count = inb(0x40);
+    count |= inb(0x40) << 8;
+    return count;
+}

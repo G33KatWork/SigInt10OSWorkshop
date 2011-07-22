@@ -1,14 +1,19 @@
 #include <print.h>
 #include <lib.h>
 
-unsigned short *videoram = (unsigned short *) 0xb8000;
-unsigned int cursorX = 0;
-unsigned int cursorY = 0;
-
 Color foregroundColor = White;
 Color backgroundColor = Black;
 
+print_handler* currentHandler = NULL;
+
 static const char numChars[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+
+void print_init(print_handler* handler)
+{
+    currentHandler = handler;
+    currentHandler->init();
+}
 
 static void reverseArray(char* arr)
 {
@@ -23,14 +28,8 @@ static void reverseArray(char* arr)
 
 void print_clear(void)
 {
-    cursorX = 0;
-    cursorY = 0;
-    
-    unsigned char attributeByte = (backgroundColor << 4) | (foregroundColor & 0x0F);
-    unsigned short blank = 0x20 /* space */ | (attributeByte << 8);
-    
-    for(int i = 0; i < 25*80; i++)
-        videoram[i] = blank;
+    if(currentHandler)
+        currentHandler->clear();
 }
 
 void print_string(char* s)
@@ -49,45 +48,8 @@ void print_string_static(const char* s)
 
 void print_char(char c)
 {
-    unsigned char attributeByte = (backgroundColor << 4) | (foregroundColor & 0x0F);
-    unsigned short attribute = attributeByte << 8;
-    unsigned short *location;
-    
-    //Backspace
-    if(c == 0x08 && cursorX)
-        cursorX--;
-        
-    //Tab
-    else if(c == 0x09)
-        cursorX = (cursorX+8) & ~(8-1);
-    
-    //Carriage Return
-    else if(c == '\r')
-        cursorX = 0;
-    
-    //New Line
-    else if(c == '\n')
-    {
-        cursorX = 0;
-        cursorY++;
-    }
-    
-    //Normal character
-    else if(c >= ' ')
-    {
-        location = videoram + (cursorY*80 + cursorX);
-        *location = c | attribute;
-        cursorX++;
-    }
-    
-    //Handle end of line
-    if (cursorX >= 80)
-    {
-        cursorX = 0;
-        cursorY ++;
-    }
-    
-    scroll();
+    if(currentHandler)
+        currentHandler->putChar(c);
 }
 
 void print_integer(uint32_t n, uint8_t radix)
@@ -106,25 +68,4 @@ void print_integer(uint32_t n, uint8_t radix)
     
     reverseArray(num);
     print_string(num);
-}
-
-void scroll()
-{
-    unsigned char attributeByte = (backgroundColor << 4) | (foregroundColor & 0x0F);
-    unsigned short blank = 0x20 /* space */ | (attributeByte << 8);
-    
-    if(cursorY >= 25)
-    {
-        for(int i = 0; i < 24*80; i++)
-            videoram[i] = videoram[i+80];
-        
-        //move all lines one line up and discard upper line
-        //memmove(vidmem, vidmem + 80, 24*80);
-        
-        //clear lowest line
-        for (int i = 24*80; i < 25*80; i++)
-            videoram[i] = blank;
-        
-        cursorY = 24;
-    }
 }

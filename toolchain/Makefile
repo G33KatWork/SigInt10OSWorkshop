@@ -8,7 +8,7 @@ include $(SRC)/toolchain/nasm.mak
 ifeq ($(USE_LLVM),1)
 include $(SRC)/toolchain/llvm.mak
 endif
-#include $(SRC)/toolchain/bochs.mak
+include $(SRC)/toolchain/bochs.mak
 #include $(SRC)/toolchain/gdb.mak
 include $(SRC)/toolchain/qemu.mak
 include $(SRC)/toolchain/gcc.mak

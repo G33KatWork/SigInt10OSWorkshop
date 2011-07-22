@@ -92,14 +92,17 @@ static void v86_start_execution(void)
         I86_IDT_ATTR_PRESENT | I86_IDT_ATTR_TASK_GATE | I86_IDT_ATTR_PRIV_KERNEL
     );
     
+    //clear busy flag for out v86 task
+    gdt_clear_tss_busy_flag(4);
+    
     //jump to v86 task
-    print_string_static("Jumping to v86 task\n");
+    //print_string_static("Jumping to v86 task\n");
     asm volatile ("ljmp $0x20, $0x0");
     
     //if a GPF is thrown, we end up here
     //since the cpu switches back to the kernel task where we handle
     //the faulting instruction and jump back to the v86 task
-    print_string_static("GPF occured\n");
+    //print_string_static("GPF occured\n");
     int errorCode;
     asm volatile ("pop %%eax" : "=a"(errorCode));
     
@@ -110,19 +113,19 @@ static void v86_start_execution(void)
         switch(*faultLoc)
         {
             case 0x66:      //O32
-                print_string_static("O32\n");
+                //print_string_static("O32\n");
                 o32 = 1;
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 continue;
             
             case 0x67:      //A32
-                print_string_static("A32\n");
+                //print_string_static("A32\n");
                 a32 = 1;
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 continue;
             
             case 0x9C:      //PUSHF
-                print_string_static("PUSHF\n");
+                //print_string_static("PUSHF\n");
                 if(o32)
                     v86_push32(v86tss.eflags);
                 else
@@ -131,7 +134,7 @@ static void v86_start_execution(void)
                 break;
             
             case 0x9D:      //POPF
-                print_string_static("POPF\n");
+                //print_string_static("POPF\n");
                 if(o32)
                     v86tss.eflags = (v86_pop32() & EFLAGS_REAL) | EFLAGS_VM;
                 else
@@ -141,7 +144,7 @@ static void v86_start_execution(void)
             
             case 0xCC:      //INT 3
             case 0xCD:      //INT x
-                print_string_static("INT x\n");
+                //print_string_static("INT x\n");
                 v86_push16(v86tss.eflags);
                 v86_push16(v86tss.cs);
                 v86_push16(v86tss.eip + (faultLoc[0] - 0xCB));
@@ -151,20 +154,20 @@ static void v86_start_execution(void)
                 break;
             
             case 0xCF:      //IRET
-                print_string_static("IRET\n");
+                //print_string_static("IRET\n");
                 v86tss.eip    = v86_pop16();
                 v86tss.cs     = v86_pop16();
                 v86tss.eflags = (v86_pop16() & EFLAGS_REAL) | EFLAGS_VM;
                 break;
                 
             case 0xE4:      //IN AL, imm8
-                print_string_static("IN AL, imm8\n");
+                //print_string_static("IN AL, imm8\n");
                 v86tss.eax = (v86tss.eax & 0xFFFFFF00) | inb(faultLoc[1]);
                 v86tss.eip = (uint16_t)(v86tss.eip + 2);
                 break;
             
             case 0xE5:      //IN (E)AX, imm8
-                print_string_static("IN (E)AX, imm8\n");
+                //print_string_static("IN (E)AX, imm8\n");
                 if(o32)
                     v86tss.eax = ind(faultLoc[1]);
                 else
@@ -173,13 +176,13 @@ static void v86_start_execution(void)
                 break;
             
             case 0xE6:      //OUT imm8, AL
-                print_string_static("OUT imm8, AL\n");
+                //print_string_static("OUT imm8, AL\n");
                 outb(faultLoc[1], (uint8_t)(v86tss.eax & 0xFF));
                 v86tss.eip = (uint16_t)(v86tss.eip + 2);
                 break;
             
             case 0xE7:      //OUT imm8, (E)AX
-                print_string_static("OUT imm8, (E)AX\n");
+                //print_string_static("OUT imm8, (E)AX\n");
                 if(o32)
                     outd(faultLoc[1], v86tss.eax);
                 else
@@ -188,13 +191,13 @@ static void v86_start_execution(void)
                 break;
             
             case 0xEC:      //IN AL, DX
-                print_string_static("IN AL, DX\n");
+                //print_string_static("IN AL, DX\n");
                 v86tss.eax = (v86tss.eax & 0xFFFFFF00) | inb((uint16_t)v86tss.edx);
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 break;
             
             case 0xED:      //IN (E)AX, DX
-                print_string_static("IN (E)AX, DX\n");
+                //print_string_static("IN (E)AX, DX\n");
                 if(o32)
                     v86tss.eax = ind((uint16_t)v86tss.edx);
                 else
@@ -203,13 +206,13 @@ static void v86_start_execution(void)
                 break;
             
             case 0xEE:      //OUT DX, AL
-                print_string_static("OUT DX, AL\n");
+                //print_string_static("OUT DX, AL\n");
                 outb((uint16_t)v86tss.edx, (uint8_t)(v86tss.eax & 0xFF));
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 break;
             
             case 0xEF:      //OUT DX, (E)AX
-                print_string_static("OUT DX, (E)AX\n");
+                //print_string_static("OUT DX, (E)AX\n");
                 if(o32)
                     outd((uint16_t)v86tss.edx, v86tss.eax);
                 else
@@ -223,7 +226,7 @@ static void v86_start_execution(void)
                 print_string_static("\n");
             
             case 0xF4:      //HLT
-                print_string_static("HLT\n");
+                //print_string_static("HLT\n");
                 //we are done, reset GPF handler
                 idt_set_gate(
                     13,
@@ -235,21 +238,21 @@ static void v86_start_execution(void)
                 return;
             
             case 0xFA:      //CLI
-                print_string_static("CLI\n");
+                //print_string_static("CLI\n");
                 v86tss.eflags &= ~EFLAGS_IF;
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 break;
             
             case 0xFB:      //STI
-                print_string_static("STI\n");
+                //print_string_static("STI\n");
                 v86tss.eflags &= ~EFLAGS_IF;
                 v86tss.eip = (uint16_t)(v86tss.eip + 1);
                 break;
         }
         
-        print_string_static("Jumping back to v86 task\n");
+        //print_string_static("Jumping back to v86 task\n");
         asm volatile ("iret");
-        print_string_static("GPF occured\n");
+        //print_string_static("GPF occured\n");
         asm volatile ("pop %%eax" : "=a"(errorCode));
         o32 = a32 = 0;
     }
@@ -265,21 +268,21 @@ void v86_bioscall(uint8_t intNum, struct v86_biosArguments arguments, struct v86
     v86tss.cs = *((uint16_t*)((intNum << 2) + 2));
     v86tss.eip = *(uint16_t*)(intNum << 2);
     
-    print_string_static("Executing INT at 0x");
+    /*print_string_static("Executing INT at 0x");
     print_integer(v86tss.cs, 16);
     print_string_static(":0x");
     print_integer(v86tss.eip, 16);
-    print_string_static("\n");
+    print_string_static("\n");*/
     
     //setup realmode stack
     v86tss.ss = (uint16_t)(REALMODESTACK_END >> 4);
-    v86tss.esp = REALMODESTACK_TOP;
+    v86tss.esp = 0x0;
     
-    print_string_static("Realmode stack is at 0x");
+    /*print_string_static("Realmode stack is at 0x");
     print_integer(v86tss.ss, 16);
     print_string_static(":0x");
     print_integer(v86tss.esp, 16);
-    print_string_static("\n");
+    print_string_static("\n");*/
     
     v86tss.ds = arguments.ds;
     v86tss.es = arguments.es;
@@ -292,9 +295,9 @@ void v86_bioscall(uint8_t intNum, struct v86_biosArguments arguments, struct v86
     v86tss.edi = arguments.edi;
     v86tss.ebp = arguments.ebp;
     
-    print_string_static("Realmode return point is at 0x");
+    /*print_string_static("Realmode return point is at 0x");
     print_integer((uint16_t)((uint32_t)realmodeCode) >> 4, 16);
-    print_string_static(":0x0\n");
+    print_string_static(":0x0\n");*/
     
     //setup return stackframe
     v86_push16((uint16_t)(v86tss.eflags & 0xFFFF));         //EFLAGS

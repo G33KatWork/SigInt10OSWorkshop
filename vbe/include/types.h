@@ -1,6 +1,8 @@
 #ifndef _ARCH_TYPES_H
 #define _ARCH_TYPES_H
 
+#define NULL    ((void*)0)
+
 /* unsigned */
 typedef unsigned char uint8_t;		    /**< Unsigned 8-bit. */
 typedef unsigned short uint16_t;	    /**< Unsigned 16-bit. */
@@ -16,5 +18,10 @@ typedef signed long long int64_t;	/**< Signed 64-bit. */
 typedef unsigned int Address;
 
 typedef __SIZE_TYPE__ size_t;
+
+//boolean stuff
+typedef int bool;
+#define FALSE 0
+#define TRUE  1
 
 #endif

@@ -38,7 +38,7 @@ endif
 
 qemu: all floppy.img
 	$(call cmd_msg,QEMU,floppy.img)
-	$(Q)$(QEMU) -fda floppy.img
+	$(Q)$(QEMU) -fda floppy.img -serial file:serialOut
 
 qemudebug: floppy.img
 	$(call cmd_msg,QEMU,floppy.img)
@@ -49,4 +49,4 @@ floppyclean:
 	$(Q)rm -f floppy.img
 
 
-.PHONY: bootfloppy floppy.img
+.PHONY: bootfloppy

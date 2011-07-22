@@ -11,13 +11,13 @@ clean: diskimageclean
 
 
 # Floppy
-diskimage: hdd.img copykernel
+diskimage: copykernel
 
 hdd.img: $(TARGET)
 	$(call cmd_msg,GUNZIP,hdd.img)
 	$(Q)gunzip -c resources/hdd.img.gz > hdd.img
 
-copykernel: $(TARGET)
+copykernel: hdd.img $(TARGET)
 	$(call cmd_msg,MOUNT,hdd.img)
 	$(Q)sudo mkdir tmp
 
@@ -41,7 +41,7 @@ endif
 	$(Q)sudo rm -Rf tmp
 
 
-qemu: all diskimage
+qemu: diskimage
 	$(call cmd_msg,QEMU,hdd.img)
 	$(Q)$(QEMU) -hda hdd.img
 
@@ -50,4 +50,4 @@ diskimageclean:
 	$(Q)rm -f hdd.img
 
 
-.PHONY: diskimage copykernel
+.PHONY: 
