@@ -52,12 +52,11 @@ struct blit_surface
     
     uint32_t bytesPerLine;
     
-    uint8_t page;
-    
     uint8_t* data;
 };
 
 void vid_getBlitSurfaceFromVBEMode(struct vbeModeInfo* modeInfo, struct blit_surface* surface);
+void vid_createOffscreenSurfaceFromVBEMode(struct vbeModeInfo* modeInfo, struct blit_surface* surface);
 
 enum video_blit_format vid_getFramebufferBlitFormat(struct blit_surface* surface);
 

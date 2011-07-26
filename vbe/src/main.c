@@ -16,8 +16,6 @@
 
 #include <bitmap_file.h>
 
-bool pageFlippingSupported = FALSE;
-
 void cpu_init(void);
 int kmain(void* mbd, unsigned int magic);
 void timerHandler(registers_t* regs);
@@ -120,39 +118,38 @@ int kmain(void* UNUSED(mbd), unsigned int UNUSED(magic))
     
     uint16_t closestMode = vbe_findClosestMode(800, 600, 32);
     vbe_setMode(closestMode);
-    
-    if(vbe_isPageFlippingAvailable(controllerInfo, vbe_getModeInfo(closestMode)))
-    {
-        print_string_static("Doublebuffering seems to be available.\n");
-        pageFlippingSupported = TRUE;
-    }
 
+    //get framebuffer surface
     struct blit_surface fbSurface;
     vid_getBlitSurfaceFromVBEMode(&vbe_currentVbeMode, &fbSurface);
     
-    uint32_t bgcolor = vid_mapRGB(16, 67, 115, &fbSurface);
-
-	if(!bitmap_check_support(bitmap_file))
+    //get offscreen surface
+    struct blit_surface offscreenSurface;
+    vid_createOffscreenSurfaceFromVBEMode(&vbe_currentVbeMode, &offscreenSurface);
+    
+    //get bitmap surface
+    if(!bitmap_check_support(bitmap_file))
 		print_string_static("Bitmap doesn't seem to be in a supported format\n");
 		    
     struct blit_surface bitmapSurface;
     bitmap_get_blit_surface(bitmap_file, &bitmapSurface);
     
+    uint32_t bgcolor = vid_mapRGB(16, 67, 115, &fbSurface);
     uint32_t x = 0, y = 0;
 	for(;;)
 	{
 	    //clear screen
-        vid_fillRect(bgcolor, 0, 0, 800, 600, &fbSurface);
+        vid_fillRect(bgcolor, 0, 0, 800, 600, &offscreenSurface);
 	    
 	    //draw silly cat
-	    vid_blit(x, y, bitmapSurface.width, bitmapSurface.height, 0, 0, &bitmapSurface, &fbSurface);
+	    vid_blit(x, y, bitmapSurface.width, bitmapSurface.height, 0, 0, &bitmapSurface, &offscreenSurface);
 	    
         x+=5;
 	    if(x > 800 - bitmapSurface.width)
             x = 0;
         
-        if(pageFlippingSupported)
-            vid_flip(TRUE, &fbSurface);
+        //copy buffer from offscreen surface to framebuffer
+        vid_blit(0, 0, 800, 600, 0, 0, &offscreenSurface, &fbSurface);
 	}
     return 0;
 }

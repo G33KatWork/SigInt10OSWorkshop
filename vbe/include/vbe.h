@@ -111,13 +111,6 @@ struct vbeControllerInfo* vbe_getControllerInfo(void);
 struct vbeModeInfo* vbe_getModeInfo(uint16_t index);
 bool vbe_setMode(uint16_t mode);
 
-bool vbe_getDisplayStart(uint16_t* scanlineStart, uint16_t* pixelStart);
-bool vbe_setDisplayStart(uint16_t scanlineStart, uint16_t pixelStart, bool vSync);
-
 uint16_t vbe_findClosestMode(uint16_t width, uint16_t height, uint8_t depth);
-bool vbe_isPageFlippingAvailable(struct vbeControllerInfo* controller, struct vbeModeInfo* mode);
-void vbe_flip(bool vSync);
-
-uint8_t vbe_getCurrentPageIndex(void);
 
 #endif

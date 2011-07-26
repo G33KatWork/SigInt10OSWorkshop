@@ -71,13 +71,11 @@ void bitmap_get_blit_surface(const uint8_t* bitmapdata, struct blit_surface* sur
 	surface->width = abs(infoheader->width);
 	surface->height = abs(infoheader->height);
 	
-	surface->data = bitmapdata + bitmap_get_file_header(bitmapdata)->bmp_offset;
+	surface->data = (void*)(bitmapdata + bitmap_get_file_header(bitmapdata)->bmp_offset);
 	
 	print_string_static("Bitmap: compression type is ");
     print_integer(infoheader->compression_type, 10);
     print_string_static("\n");
-	
-    surface->page = 0;
 	
 	if(infoheader->compression_type == BITMAP_COMP_RGB)
 	{

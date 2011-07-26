@@ -5,8 +5,6 @@
 
 struct vbeModeInfo vbe_currentVbeMode;
 
-uint8_t vbe_currentPage = 0;
-
 struct vbeControllerInfo* vbe_getControllerInfo()
 {
     struct vbeControllerInfo* info = (struct vbeControllerInfo*)REALMODE_PTR(VBEDATA_SEG, CONTROLLERINFO_OFF);
@@ -70,49 +68,6 @@ bool vbe_setMode(uint16_t mode)
     }
     
     return FALSE;
-}
-
-bool vbe_getDisplayStart(uint16_t* scanlineStart, uint16_t* pixelStart)
-{
-    struct v86_biosArguments results = {.eax = VBEFUNC_SETGET_DISPLAY_START, .ebx = 0x1};
-    v86_bioscall(0x10, results, &results);
-    
-    if(results.eax == 0x4f)
-    {
-        print_string_static("First Displayed Pixel In Scan Line: ");
-        print_integer(results.ecx, 16);
-        print_string_static("\n");
-        print_string_static("First Displayed Scan Line: ");
-        print_integer(results.edx, 16);
-        print_string_static("\n");
-        
-        if(scanlineStart)
-            *scanlineStart = results.edx & 0xFFFF;
-        
-        if(pixelStart)
-            *pixelStart = results.ecx & 0xFFFF;
-        
-        return TRUE;
-    }
-    else
-    {
-        print_string_static("Getting VBE display start was not successful - wrong return value in AX :'(\n");
-        return FALSE;
-    }
-}
-
-bool vbe_setDisplayStart(uint16_t scanlineStart, uint16_t pixelStart, bool vSync)
-{
-    struct v86_biosArguments results = {.eax = VBEFUNC_SETGET_DISPLAY_START, .ebx = (vSync ? 0x80 : 0x00), .ecx = pixelStart, .edx = scanlineStart};
-    v86_bioscall(0x10, results, &results);
-    
-    if(results.eax == 0x4f)
-        return TRUE;
-    else
-    {
-        print_string_static("Setting VBE display start was not successful - wrong return value in AX :'(\n");
-        return FALSE;
-    }
 }
 
 uint16_t vbe_findClosestMode(uint16_t width, uint16_t height, uint8_t depth)
@@ -179,32 +134,4 @@ uint16_t vbe_findClosestMode(uint16_t width, uint16_t height, uint8_t depth)
     
     //Set bit 14 for linear framebuffer
     return bestmode | (1 << 14);
-}
-
-bool vbe_isPageFlippingAvailable(struct vbeControllerInfo* controller, struct vbeModeInfo* mode)
-{
-    uint32_t pageSize = mode->bytesPerScanline * mode->Yres;
-    
-    //check for enough memory
-    if(controller->totalMemory * 64*1024 < pageSize*2)
-        return FALSE;
-    
-    //check for success of set display start
-    if(!vbe_setDisplayStart(0, 0, FALSE))
-        return FALSE;
-    
-    return TRUE;
-}
-
-void vbe_flip(bool vSync)
-{
-    uint16_t newScanlineStart = vbe_currentVbeMode.Yres * vbe_currentPage;
-    vbe_currentPage ^= 1;
-    
-    vbe_setDisplayStart(newScanlineStart, 0, vSync);
-}
-
-uint8_t vbe_getCurrentPageIndex()
-{
-    return vbe_currentPage;
 }

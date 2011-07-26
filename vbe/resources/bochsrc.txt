@@ -1,6 +1,6 @@
 megs: 128
 romimage: file=../toolchain/x86_64-elf/share/bochs/BIOS-bochs-latest
-vgaromimage: file=../toolchain/x86_64-elf/share/bochs/VGABIOS-lgpl-latest
+vgaromimage: file=../toolchain/x86_64-elf/share/bochs/VGABIOS-lgpl-latest-debug
 floppya: 1_44=floppy.img, status=inserted
 boot: a
 log: bochsout.txt
@@ -14,5 +14,5 @@ display_library: sdl
 panic: action=report
 error: action=report
 info: action=report
-debug: action=report
+#debug: action=report
 

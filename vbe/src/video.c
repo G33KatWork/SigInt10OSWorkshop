@@ -37,9 +37,18 @@ void vid_getBlitSurfaceFromVBEMode(struct vbeModeInfo* modeInfo, struct blit_sur
     
     surface->bytesPerLine = modeInfo->bytesPerScanline;
     
-    surface->page = 0;
-    
     surface->data = (uint8_t*)modeInfo->physbase;
+}
+
+
+#define OFFSCREEN_BUFFER_LOCATION 0x400000
+void vid_createOffscreenSurfaceFromVBEMode(struct vbeModeInfo* modeInfo, struct blit_surface* surface)
+{
+    //in general we can copy everything, but replace the data buffer pointer with our own
+    vid_getBlitSurfaceFromVBEMode(modeInfo, surface);
+    
+    //FIXME: Use some real allocator here... Even only a placement allocator should suffice, but I'm soooo lazy...
+    surface->data = (void*)OFFSCREEN_BUFFER_LOCATION;
 }
 
 enum video_blit_format vid_getFramebufferBlitFormat(struct blit_surface* surface)
@@ -245,7 +254,7 @@ void vid_unmapRGBA(uint32_t color, uint8_t* red, uint8_t* green, uint8_t* blue, 
 
 uint8_t* vid_getFramebufferPositionPointer(uint32_t x, uint32_t y, struct blit_surface* surface)
 {
-    uint8_t* ptr = surface->data + (surface->height * surface->bytesPerLine * surface->page);
+    uint8_t* ptr = surface->data;
     ptr += surface->bytesPerLine * y + x * surface->bytesPerPixel;
     
     return ptr;
@@ -409,10 +418,4 @@ void vid_blit(int x, int y, int width, int height, int offset_x, int offset_y, s
         //print_string_static("vid_blit: Using generic blitter...\n");
         blit_generic(x, y, width, height, offset_x, offset_y, src, dst);
     }
-}
-
-void vid_flip(bool vSync, struct blit_surface* surface)
-{
-    vbe_flip(vSync);
-    surface->page ^= 1;
 }
