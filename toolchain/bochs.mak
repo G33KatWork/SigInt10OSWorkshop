@@ -38,6 +38,9 @@ $(TOOLCHAIN_ROOTDIR)/.bochs-configure: $(TOOLCHAIN_ROOTDIR)/.bochs-extract
 		--enable-smp \
 		--enable-x86-64 \
 		--enable-smp \
+		--enable-acpi \
+		--enable-pci \
+		--enable-show-ips \
 		--prefix=$(TOOLCHAIN_ROOTDIR) \
 		$(QOUTPUT)
 	$(Q)touch $(@)

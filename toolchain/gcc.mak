@@ -8,10 +8,7 @@ PATH += :$(TOOLCHAIN_ROOTDIR)/bin
 # Hack to build on OS X.
 ifeq ($(shell uname),Darwin)
 # fix compilation issue with llvm/clang (internal compiler error at runtime)
-CC = /usr/bin/gcc-4.2
-CPP = /usr/bin/cpp-4.2
-CXX = /usr/bin/g++-4.2
-LD = /usr/bin/gcc-4.2
+GCC_CONFENV = CC=/usr/bin/gcc-4.2 CPP=/usr/bin/cpp-4.2 CXX=/usr/bin/g++-4.2 LD=/usr/bin/gcc-4.2
 endif
 
 # Download
@@ -43,13 +40,12 @@ $(TOOLCHAIN_ROOTDIR)/.gcc-configure: $(TOOLCHAIN_ROOTDIR)/.gcc-extract
 	$(Q)mkdir -p $(TOOLCHAIN_BUILDDIR)/gcc-build
 	$(call cmd_msg,CONFIG,$(TOOLCHAIN_TARGET)/gcc-$(GCC_VERSION) ($(TOOLCHAIN_TARGET)))
 	$(Q)cd $(TOOLCHAIN_BUILDDIR)/gcc-build; \
-		../gcc-$(GCC_VERSION)/configure \
+		$(GCC_CONFENV) ../gcc-$(GCC_VERSION)/configure \
 			--prefix=$(TOOLCHAIN_ROOTDIR) \
 			--target=$(TOOLCHAIN_TARGET) \
 			--without-headers \
 			--enable-languages=c,c++ --disable-nls \
-			$(QOUTPUT) \
-			$(GCC_CONFOPTS)
+			$(QOUTPUT)
 	$(Q)touch  $(@)
 
 

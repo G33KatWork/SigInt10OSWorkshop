@@ -7,10 +7,7 @@ QEMU_PATCHES	    :=
 # Hack to build on OS X.
 ifeq ($(shell uname),Darwin)
 # fix compilation issue with llvm/clang (segfault at runtime)
-CC = /usr/bin/gcc-4.2
-CPP = /usr/bin/cpp-4.2
-CXX = /usr/bin/g++-4.2
-LD = /usr/bin/gcc-4.2
+QEMU_CONFENV = CC=/usr/bin/gcc-4.2 CPP=/usr/bin/cpp-4.2 CXX=/usr/bin/g++-4.2 LD=/usr/bin/gcc-4.2
 endif
 
 # Download
@@ -39,7 +36,7 @@ $(TOOLCHAIN_ROOTDIR)/.qemu-configure: $(TOOLCHAIN_ROOTDIR)/.qemu-extract
 	$(call cmd_msg,CONFIG,$(TOOLCHAIN_TARGET)/qemu-$(QEMU_VERSION) ($(TOOLCHAIN_TARGET)))
 ifeq ($(shell uname),Darwin)
 	$(Q)cd $(TOOLCHAIN_BUILDDIR)/qemu-$(QEMU_VERSION); \
-		./configure \
+		$(QEMU_CONFENV) ./configure \
 		--enable-cocoa \
 		--disable-sdl \
 		--disable-xen \
